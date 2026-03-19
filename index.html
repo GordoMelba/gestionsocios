@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>América del Sud</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#eef1f9; color:#0d1f5c; font-family:'Lato',Arial,sans-serif; min-height:100vh; }
+
+.sidebar {
+  position:fixed; left:0; top:0; bottom:0; width:240px;
+  background:#0d1f5c; display:flex; flex-direction:column; z-index:100;
+  border-right:4px solid #f0c040;
+}
+.logo-area {
+  padding:18px 16px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.15);
+  display:flex; align-items:center; gap:12px;
+}
+.club-name-top { font-family:'Oswald',sans-serif; font-size:16px; letter-spacing:2px; text-transform:uppercase; line-height:1.1; color:#fff; }
+.club-name-bot { font-size:10px; color:rgba(255,255,255,0.45); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+.nav { flex:1; padding:10px 0; overflow-y:auto; }
+.nav-sec { font-size:9px; color:rgba(255,255,255,0.35); letter-spacing:3px; text-transform:uppercase; padding:12px 16px 4px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:10px 16px;
+  cursor:pointer; color:rgba(255,255,255,0.6); font-size:14px;
+  border-left:3px solid transparent; transition:all .15s;
+}
+.nav-item:hover { color:#fff; background:rgba(255,255,255,0.08); }
+.nav-item.active { color:#f0c040; border-left-color:#f0c040; background:rgba(240,192,64,0.1); font-weight:700; }
+.nav-icon { width:20px; text-align:center; font-size:16px; }
+.sidebar-foot { padding:14px 16px; border-top:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; gap:10px; }
+.av-admin { width:34px; height:34px; background:#f0c040; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#0d1f5c; font-family:'Oswald',sans-serif; font-size:15px; flex-shrink:0; }
+.av-name { color:#fff; font-size:13px; font-weight:700; }
+.av-role { color:rgba(255,255,255,0.45); font-size:11px; }
+
+.main { margin-left:240px; padding:28px 32px; min-height:100vh; }
+.page-hdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+.page-title { font-family:'Oswald',sans-serif; font-size:30px; letter-spacing:2px; color:#0d1f5c; text-transform:uppercase; line-height:1; }
+.page-sub { font-size:13px; color:#6676a0; margin-top:4px; }
+
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:6px; border:none; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; transition:all .15s; }
+.btn-navy { background:#0d1f5c; color:#fff; }
+.btn-navy:hover { background:#1e3ab8; }
+.btn-ghost { background:transparent; color:#6676a0; border:1.5px solid #d0d8f0; }
+.btn-ghost:hover { color:#0d1f5c; border-color:#0d1f5c; }
+.btn-sm { padding:5px 11px; font-size:12px; }
+
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat {
+  background:#fff; border:1px solid #d0d8f0; border-radius:10px; padding:18px;
+  position:relative; overflow:hidden; box-shadow:0 2px 6px rgba(13,31,92,.07);
+}
+.stat-line { height:4px; position:absolute; top:0; left:0; right:0; }
+.stat-ico { font-size:24px; margin-bottom:6px; }
+.stat-lbl { font-size:11px; color:#6676a0; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; }
+.stat-val { font-family:'Oswald',sans-serif; font-size:42px; color:#0d1f5c; line-height:1; margin:2px 0; }
+.stat-note { font-size:12px; color:#1a8c4e; }
+
+.banner {
+  background:#0d1f5c; border-radius:12px; padding:22px 26px; margin-bottom:24px;
+  display:flex; align-items:center; gap:18px;
+}
+.banner-title { font-family:'Oswald',sans-serif; font-size:24px; letter-spacing:3px; color:#fff; text-transform:uppercase; }
+.banner-sub { font-size:13px; color:rgba(255,255,255,0.6); margin-top:3px; }
+
+.card { background:#fff; border:1px solid #d0d8f0; border-radius:10px; box-shadow:0 2px 6px rgba(13,31,92,.07); overflow:hidden; margin-bottom:20px; }
+.card-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid #d0d8f0; }
+.card-title { font-family:'Oswald',sans-serif; font-size:15px; letter-spacing:1px; text-transform:uppercase; color:#0d1f5c; }
+.search { display:flex; align-items:center; gap:7px; background:#eef1f9; border:1.5px solid #d0d8f0; border-radius:6px; padding:6px 11px; }
+.search input { background:none; border:none; outline:none; font-family:'Lato',sans-serif; font-size:13px; color:#0d1f5c; width:200px; }
+.search input::placeholder { color:#6676a0; }
+table { width:100%; border-collapse:collapse; }
+th { padding:9px 18px; text-align:left; font-size:10px; color:#6676a0; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; background:#eef1f9; }
+td { padding:11px 18px; font-size:13px; border-top:1px solid #e8edf8; vertical-align:middle; }
+tr:hover td { background:#f7f9ff; }
+.av-row { display:flex; align-items:center; gap:11px; }
+.av-circle { border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-family:'Oswald',sans-serif; flex-shrink:0; }
+.row-name { font-weight:700; font-size:13px; color:#0d1f5c; }
+.row-id { font-size:11px; color:#6676a0; }
+
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+.b-green { background:rgba(26,140,78,.12); color:#1a8c4e; border:1px solid rgba(26,140,78,.22); }
+.b-red   { background:rgba(217,48,37,.1);  color:#d93025; border:1px solid rgba(217,48,37,.2); }
+.b-yellow{ background:rgba(240,192,64,.18);color:#996600; border:1px solid rgba(240,192,64,.4); }
+.b-navy  { background:#0d1f5c; color:#fff; }
+.b-blue  { background:rgba(30,58,184,.1);  color:#1e3ab8; border:1px solid rgba(30,58,184,.2); }
+.dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+.tabs { display:flex; gap:3px; background:#fff; border:1.5px solid #d0d8f0; border-radius:8px; padding:4px; margin-bottom:18px; width:fit-content; }
+.tab { padding:6px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; color:#6676a0; font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase; transition:all .15s; }
+.tab:hover { color:#0d1f5c; }
+.tab.on { background:#0d1f5c; color:#fff; }
+
+.overlay { position:fixed; inset:0; background:rgba(13,31,92,0.55); z-index:999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
+.modal { background:#fff; border-radius:14px; padding:30px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 60px rgba(13,31,92,0.25); }
+.modal-title { font-family:'Oswald',sans-serif; font-size:21px; letter-spacing:1px; text-transform:uppercase; color:#0d1f5c; margin-bottom:22px; display:flex; align-items:center; justify-content:space-between; }
+.modal-x { background:none; border:none; font-size:18px; color:#6676a0; cursor:pointer; }
+.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+.fg { display:flex; flex-direction:column; gap:5px; }
+.fg.full { grid-column:1/-1; }
+label { font-size:11px; color:#6676a0; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+input, select, textarea { background:#eef1f9; border:1.5px solid #d0d8f0; border-radius:6px; padding:9px 12px; color:#0d1f5c; font-family:'Lato',sans-serif; font-size:13px; outline:none; transition:border .12s; }
+input:focus, select:focus, textarea:focus { border-color:#0d1f5c; background:#fff; }
+.mactions { display:flex; justify-content:flex-end; gap:9px; margin-top:22px; padding-top:18px; border-top:1px solid #e8edf8; }
+.divider { height:1px; background:#e8edf8; margin:16px 0; }
+
+.acc-card { border-radius:12px; padding:28px; text-align:center; margin-top:18px; }
+.acc-ok { background:rgba(26,140,78,.08); border:2px solid rgba(26,140,78,.3); }
+.acc-no { background:rgba(217,48,37,.08); border:2px solid rgba(217,48,37,.25); }
+
+.egrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+.ecard { background:#fff; border:1px solid #d0d8f0; border-radius:12px; overflow:hidden; box-shadow:0 2px 6px rgba(13,31,92,.07); transition:transform .15s, box-shadow .15s; }
+.ecard:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(13,31,92,.12); }
+.ebanner { height:100px; background:#0d1f5c; display:flex; align-items:center; justify-content:center; font-size:48px; position:relative; }
+.edate { position:absolute; top:10px; right:10px; background:#f0c040; color:#0d1f5c; border-radius:5px; padding:2px 8px; font-size:11px; font-weight:700; font-family:'Oswald',sans-serif; }
+.ebody { padding:16px; }
+.etitle { font-family:'Oswald',sans-serif; font-size:17px; letter-spacing:1px; text-transform:uppercase; color:#0d1f5c; margin-bottom:6px; }
+.emeta { font-size:12px; color:#6676a0; display:flex; flex-direction:column; gap:2px; margin-bottom:10px; }
+.eprog { background:#eef1f9; border-radius:4px; height:5px; margin-bottom:10px; overflow:hidden; }
+.eprogbar { height:100%; border-radius:4px; background:#0d1f5c; }
+.efooter { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid #e8edf8; }
+.eprice { font-family:'Oswald',sans-serif; font-size:21px; color:#0d1f5c; }
+.eavail { font-size:11px; color:#6676a0; }
+
+.mp-head { display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid #e8edf8; margin-bottom:18px; }
+.mp-ico { width:36px; height:36px; background:#009EE3; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:16px; }
+.card-prev { background:linear-gradient(135deg,#0d1f5c,#1a3a8c); border-radius:10px; padding:18px; margin:14px 0; color:#fff; }
+.card-num { font-family:monospace; font-size:17px; letter-spacing:4px; margin-bottom:12px; }
+.card-row { display:flex; justify-content:space-between; font-size:11px; color:rgba(255,255,255,0.6); }
+
+.upzone { border:2px dashed #d0d8f0; border-radius:8px; padding:28px; text-align:center; cursor:pointer; transition:all .15s; }
+.upzone:hover { border-color:#0d1f5c; background:rgba(13,31,92,0.02); }
+.uplist { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+.upitem { display:flex; align-items:center; justify-content:space-between; background:#eef1f9; border-radius:6px; padding:8px 12px; font-size:13px; }
+
+.alert-info { background:rgba(30,58,184,.07); border:1px solid rgba(30,58,184,.2); color:#1e3ab8; border-radius:7px; padding:11px 14px; font-size:13px; margin-bottom:16px; }
+
+.cred { background:#0d1f5c; border-radius:12px; padding:22px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.cred-name { font-family:'Oswald',sans-serif; font-size:19px; letter-spacing:2px; color:#fff; text-transform:uppercase; text-align:center; }
+.cred-detail { font-size:12px; color:rgba(255,255,255,0.55); }
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:#eef1f9; }
+::-webkit-scrollbar-thumb { background:#c0c8e0; border-radius:3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+function Escudo({ size=48 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="47" stroke="#fff" strokeWidth="5" fill="white"/>
+      <line x1="8" y1="38" x2="92" y2="38" stroke="#fff" strokeWidth="4"/>
+      <polygon points="50,85 12,38 88,38" fill="none" stroke="#fff" strokeWidth="4"/>
+      <line x1="50" y1="8" x2="12" y2="38" stroke="#fff" strokeWidth="4"/>
+      <line x1="50" y1="8" x2="88" y2="38" stroke="#fff" strokeWidth="4"/>
+      <text x="50" y="26" textAnchor="middle" fill="#fff" fontFamily="Arial" fontWeight="bold" fontSize="14">C</text>
+      <text x="20" y="74" textAnchor="middle" fill="#fff" fontFamily="Arial" fontWeight="bold" fontSize="14">S</text>
+      <text x="80" y="74" textAnchor="middle" fill="#fff" fontFamily="Arial" fontWeight="bold" fontSize="14">D</text>
+      <text x="50" y="60" textAnchor="middle" fill="#fff" fontFamily="Arial" fontWeight="bold" fontSize="9">AMERICA</text>
+      <text x="50" y="71" textAnchor="middle" fill="#fff" fontFamily="Arial" fontWeight="bold" fontSize="9">DEL SUD</text>
+    </svg>
+  );
+}
+
+function EscudoBlue({ size=48 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="47" stroke="#1e3ab8" strokeWidth="5" fill="white"/>
+      <line x1="8" y1="38" x2="92" y2="38" stroke="#1e3ab8" strokeWidth="4"/>
+      <polygon points="50,85 12,38 88,38" fill="none" stroke="#1e3ab8" strokeWidth="4"/>
+      <line x1="50" y1="8" x2="12" y2="38" stroke="#1e3ab8" strokeWidth="4"/>
+      <line x1="50" y1="8" x2="88" y2="38" stroke="#1e3ab8" strokeWidth="4"/>
+      <text x="50" y="26" textAnchor="middle" fill="#1e3ab8" fontFamily="Arial" fontWeight="bold" fontSize="14">C</text>
+      <text x="20" y="74" textAnchor="middle" fill="#1e3ab8" fontFamily="Arial" fontWeight="bold" fontSize="14">S</text>
+      <text x="80" y="74" textAnchor="middle" fill="#1e3ab8" fontFamily="Arial" fontWeight="bold" fontSize="14">D</text>
+      <text x="50" y="60" textAnchor="middle" fill="#1e3ab8" fontFamily="Arial" fontWeight="bold" fontSize="9">AMERICA</text>
+      <text x="50" y="71" textAnchor="middle" fill="#1e3ab8" fontFamily="Arial" fontWeight="bold" fontSize="9">DEL SUD</text>
+    </svg>
+  );
+}
+
+const COLORS = ['#1a3a8c','#c0392b','#1a7a4e','#7b2d8b','#c67c00','#0d5c8c'];
+const ini = (n,a) => ((n||'')[0]||'').toUpperCase()+((a||'')[0]||'').toUpperCase();
+
+const initMembers = [
+  {id:'SOC-001',name:'Martín', surname:'González',activity:'Fútbol',  familyPlan:true, joinDate:'2020-03-15',status:'Al día',   color:'#1a3a8c',nfc:true},
+  {id:'SOC-002',name:'Laura',  surname:'Ferreyra', activity:'Natación',familyPlan:false,joinDate:'2021-07-22',status:'Al día',   color:'#1a7a4e',nfc:false},
+  {id:'SOC-003',name:'Carlos', surname:'Pérez',    activity:'Tenis',   familyPlan:true, joinDate:'2019-11-08',status:'Vencido', color:'#c0392b',nfc:false},
+  {id:'SOC-004',name:'Ana',    surname:'Ramírez',  activity:'Gym',     familyPlan:false,joinDate:'2022-01-30',status:'Al día',   color:'#c67c00',nfc:true},
+  {id:'SOC-005',name:'Diego',  surname:'López',    activity:'Handball',familyPlan:true, joinDate:'2023-05-12',status:'Pendiente',color:'#7b2d8b',nfc:false},
+  {id:'SOC-006',name:'Sofía',  surname:'Torres',   activity:'Básquet', familyPlan:false,joinDate:'2021-09-01',status:'Al día',   color:'#0d5c8c',nfc:false},
+];
+const initEvents = [
+  {id:'EVT-001',title:'Final Torneo Fútbol',date:'2026-04-12',time:'18:00',location:'Cancha Principal',price:1200,emoji:'⚽',totalTickets:200,sold:87},
+  {id:'EVT-002',title:'Clásico Handball',   date:'2026-04-20',time:'20:00',location:'Polideportivo',   price:800, emoji:'🤾',totalTickets:150,sold:42},
+  {id:'EVT-003',title:'Copa Natación 2026', date:'2026-05-05',time:'10:00',location:'Pileta Olímpica', price:500, emoji:'🏊',totalTickets:100,sold:29},
+  {id:'EVT-004',title:'Torneo Tenis Dobles',date:'2026-05-18',time:'15:00',location:'Cancha Nro. 3',   price:600, emoji:'🎾',totalTickets:80, sold:15},
+];
+
+function Av({m, size=35}) {
+  return (
+    <div className="av-circle" style={{width:size,height:size,background:m.color,fontSize:Math.round(size*.34)}}>
+      {ini(m.name,m.surname)}
+    </div>
+  );
+}
+function SBadge({s}) {
+  const cl = {'Al día':'b-green','Vencido':'b-red','Pendiente':'b-yellow'};
+  return <span className={`badge ${cl[s]||'b-blue'}`}><span className="dot"></span>{s}</span>;
+}
+
+function QRModal({member,onClose}) {
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.innerHTML = '';
+      try {
+        new QRCode(ref.current, {
+          text: JSON.stringify({id:member.id, nombre:`${member.name} ${member.surname}`, estado:member.status}),
+          width:160, height:160, colorDark:'#0d1f5c', colorLight:'#ffffff'
+        });
+      } catch(e) {}
+    }
+  }, [member]);
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:380}} onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Credencial Digital <button className="modal-x" onClick={onClose}>✕</button></div>
+        <div className="cred">
+          <EscudoBlue size={48}/>
+          <div className="cred-name">{member.name} {member.surname}</div>
+          <div className="cred-detail">{member.id} · {member.activity} · {member.familyPlan?'Familiar':'Individual'}</div>
+          <SBadge s={member.status}/>
+          <div style={{background:'#fff',borderRadius:8,padding:8}}><div ref={ref}></div></div>
+          <div style={{fontSize:11,color:'rgba(255,255,255,.4)'}}>Presentar al ingresar al club</div>
+        </div>
+        <div className="divider"></div>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
+          {member.nfc
+            ? <><span>📡</span><span className="badge b-blue">NFC Vinculado</span></>
+            : <button className="btn btn-ghost btn-sm">📡 Vincular NFC</button>
+          }
+        </div>
+        <div className="mactions" style={{justifyContent:'center'}}>
+          <button className="btn btn-ghost btn-sm" onClick={()=>window.print()}>🖨 Imprimir</button>
+          <button className="btn btn-navy btn-sm" onClick={onClose}>Listo</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NewMemberModal({onClose,onSave}) {
+  const [f,setF] = useState({name:'',surname:'',activity:'Fútbol',familyPlan:false,joinDate:new Date().toISOString().slice(0,10),status:'Al día'});
+  const s = (k,v) => setF(p=>({...p,[k]:v}));
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Registrar Nuevo Socio <button className="modal-x" onClick={onClose}>✕</button></div>
+        <div className="fgrid">
+          <div className="fg"><label>Nombre</label><input value={f.name} onChange={e=>s('name',e.target.value)} placeholder="Ej: Martín"/></div>
+          <div className="fg"><label>Apellido</label><input value={f.surname} onChange={e=>s('surname',e.target.value)} placeholder="Ej: González"/></div>
+          <div className="fg"><label>Actividad</label>
+            <select value={f.activity} onChange={e=>s('activity',e.target.value)}>
+              {['Fútbol','Natación','Tenis','Gym','Handball','Básquet','Atletismo','Otros'].map(a=><option key={a}>{a}</option>)}
+            </select>
+          </div>
+          <div className="fg"><label>Fecha de ingreso</label><input type="date" value={f.joinDate} onChange={e=>s('joinDate',e.target.value)}/></div>
+          <div className="fg"><label>Estado cuota</label>
+            <select value={f.status} onChange={e=>s('status',e.target.value)}>
+              <option>Al día</option><option>Pendiente</option><option>Vencido</option>
+            </select>
+          </div>
+          <div className="fg" style={{justifyContent:'flex-end',paddingBottom:4}}>
+            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',textTransform:'none',letterSpacing:0,fontSize:14,fontWeight:700}}>
+              <input type="checkbox" checked={f.familyPlan} onChange={e=>s('familyPlan',e.target.checked)} style={{width:16,height:16}}/>
+              Plan Familiar
+            </label>
+          </div>
+        </div>
+        <div className="mactions">
+          <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-navy" onClick={()=>{if(!f.name||!f.surname)return;onSave({...f,id:`SOC-${String(Date.now()).slice(-4)}`,color:COLORS[Math.floor(Math.random()*COLORS.length)],nfc:false});onClose();}}>Registrar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UploadModal({member,onClose}) {
+  const [files,setFiles] = useState([]);
+  const add = () => setFiles(p=>[...p,{name:`comprobante_${Date.now()}.pdf`,size:'142 KB'}]);
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Comprobante de Pago <button className="modal-x" onClick={onClose}>✕</button></div>
+        {member && (
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16,padding:'10px 14px',background:'#eef1f9',borderRadius:8}}>
+            <Av m={member}/>
+            <div><div className="row-name">{member.name} {member.surname}</div><div className="row-id">{member.id}</div></div>
+            <div style={{marginLeft:'auto'}}><SBadge s={member.status}/></div>
+          </div>
+        )}
+        <div className="upzone" onClick={add} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();add();}}>
+          <div style={{fontSize:30,marginBottom:8}}>📎</div>
+          <div style={{fontWeight:700,marginBottom:4}}>Arrastrá o hacé clic para subir</div>
+          <div style={{color:'#6676a0',fontSize:13}}>PDF, PNG, JPG — Máximo 10MB</div>
+        </div>
+        {files.length > 0 && (
+          <div className="uplist">
+            {files.map((f,i) => (
+              <div key={i} className="upitem">
+                <span>📄 {f.name}</span>
+                <span style={{display:'flex',gap:8,alignItems:'center'}}><span style={{color:'#6676a0',fontSize:12}}>{f.size}</span><span className="badge b-green">✓ Subido</span></span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="mactions">
+          <button className="btn btn-ghost" onClick={onClose}>Cerrar</button>
+          <button className="btn btn-navy" onClick={onClose}>Confirmar Pago</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentModal({event,onClose}) {
+  const [step,setStep] = useState(1);
+  const [qty,setQty] = useState(1);
+  const [card,setCard] = useState({num:'',name:'',exp:'',cvv:''});
+  const [done,setDone] = useState(false);
+  const total = event.price * qty;
+  const fmt = n => n.toLocaleString('es-AR');
+  const fmtCard = v => v.replace(/[^0-9]/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+
+  if (done) return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:380,textAlign:'center'}} onClick={e=>e.stopPropagation()}>
+        <div style={{fontSize:52,marginBottom:10}}>🎉</div>
+        <div style={{fontFamily:"'Oswald',sans-serif",fontSize:24,letterSpacing:2,color:'#0d1f5c',marginBottom:10}}>¡PAGO EXITOSO!</div>
+        <p style={{color:'#6676a0',fontSize:13,marginBottom:18}}>Tus entradas fueron procesadas correctamente.</p>
+        <div style={{background:'#eef1f9',borderRadius:8,padding:14,marginBottom:18}}>
+          <div style={{fontWeight:700,marginBottom:3}}>{event.title}</div>
+          <div style={{color:'#6676a0',fontSize:13}}>{qty} entrada{qty>1?'s':''} · ${fmt(total)}</div>
+        </div>
+        <button className="btn btn-navy" style={{width:'100%'}} onClick={onClose}>Cerrar</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Compra de Entradas <button className="modal-x" onClick={onClose}>✕</button></div>
+        {step===1 && <>
+          <div style={{background:'#eef1f9',borderRadius:8,padding:14,marginBottom:18}}>
+            <div style={{fontSize:32,marginBottom:6}}>{event.emoji}</div>
+            <div style={{fontFamily:"'Oswald',sans-serif",fontSize:17,textTransform:'uppercase',color:'#0d1f5c'}}>{event.title}</div>
+            <div style={{color:'#6676a0',fontSize:13,marginTop:4}}>📅 {event.date} · {event.time} · 📍 {event.location}</div>
+          </div>
+          <div className="fg" style={{marginBottom:18}}>
+            <label>Cantidad de entradas</label>
+            <div style={{display:'flex',alignItems:'center',gap:14,marginTop:6}}>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setQty(Math.max(1,qty-1))}>−</button>
+              <span style={{fontFamily:"'Oswald',sans-serif",fontSize:30,minWidth:32,textAlign:'center',color:'#0d1f5c'}}>{qty}</span>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setQty(Math.min(10,qty+1))}>+</button>
+              <span style={{color:'#6676a0',fontSize:13}}>(${fmt(event.price)} c/u)</span>
+            </div>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:14,background:'#0d1f5c',borderRadius:8,marginBottom:18}}>
+            <span style={{color:'#fff',fontWeight:700}}>Total</span>
+            <span style={{fontFamily:"'Oswald',sans-serif",fontSize:24,color:'#f0c040'}}>${fmt(total)}</span>
+          </div>
+          <div className="mactions">
+            <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+            <button className="btn btn-navy" onClick={()=>setStep(2)}>Continuar →</button>
+          </div>
+        </>}
+        {step===2 && <>
+          <div className="mp-head">
+            <div className="mp-ico">M</div>
+            <div><div style={{fontWeight:700,fontSize:14,color:'#0d1f5c'}}>Mercado Pago</div><div style={{fontSize:11,color:'#6676a0'}}>Pago seguro con SSL</div></div>
+            <div style={{marginLeft:'auto',fontSize:13,color:'#6676a0'}}>Total: <strong style={{color:'#0d1f5c'}}>${fmt(total)}</strong></div>
+          </div>
+          <div className="card-prev">
+            <div className="card-num">{card.num||'•••• •••• •••• ••••'}</div>
+            <div className="card-row">
+              <div><div style={{fontSize:9,marginBottom:2}}>TITULAR</div>{card.name||'NOMBRE APELLIDO'}</div>
+              <div><div style={{fontSize:9,marginBottom:2}}>VENCE</div>{card.exp||'••/••'}</div>
+            </div>
+          </div>
+          <div className="fgrid">
+            <div className="fg full"><label>Número de tarjeta</label><input value={card.num} onChange={e=>setCard(p=>({...p,num:fmtCard(e.target.value)}))} placeholder="0000 0000 0000 0000" maxLength={19}/></div>
+            <div className="fg full"><label>Nombre en la tarjeta</label><input value={card.name} onChange={e=>setCard(p=>({...p,name:e.target.value.toUpperCase()}))} placeholder="NOMBRE APELLIDO"/></div>
+            <div className="fg"><label>Vencimiento</label><input value={card.exp} onChange={e=>setCard(p=>({...p,exp:e.target.value}))} placeholder="MM/AA" maxLength={5}/></div>
+            <div className="fg"><label>CVV</label><input value={card.cvv} onChange={e=>setCard(p=>({...p,cvv:e.target.value.replace(/[^0-9]/g,'').slice(0,4)}))} placeholder="•••" type="password" maxLength={4}/></div>
+          </div>
+          <div className="alert-info" style={{marginTop:12}}>ℹ️ Demo — en producción se integra con Mercado Pago (Checkout Pro / SDK JS).</div>
+          <div className="mactions">
+            <button className="btn btn-ghost" onClick={()=>setStep(1)}>← Atrás</button>
+            <button className="btn btn-navy" onClick={()=>setDone(true)}>💳 Pagar ${fmt(total)}</button>
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+}
+
+function NewEventModal({onClose,onSave}) {
+  const [f,setF] = useState({title:'',date:'',time:'18:00',location:'',price:'',totalTickets:'100',category:'Fútbol',emoji:'⚽'});
+  const s = (k,v) => setF(p=>({...p,[k]:v}));
+  const em = {'Fútbol':'⚽','Natación':'🏊','Tenis':'🎾','Handball':'🤾','Básquet':'🏀','Atletismo':'🏃','Otros':'🏆'};
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Nuevo Evento <button className="modal-x" onClick={onClose}>✕</button></div>
+        <div className="fgrid">
+          <div className="fg full"><label>Título</label><input value={f.title} onChange={e=>s('title',e.target.value)} placeholder="Ej: Final Torneo Fútbol 2026"/></div>
+          <div className="fg"><label>Fecha</label><input type="date" value={f.date} onChange={e=>s('date',e.target.value)}/></div>
+          <div className="fg"><label>Hora</label><input type="time" value={f.time} onChange={e=>s('time',e.target.value)}/></div>
+          <div className="fg full"><label>Lugar</label><input value={f.location} onChange={e=>s('location',e.target.value)} placeholder="Ej: Cancha Principal"/></div>
+          <div className="fg"><label>Precio ($)</label><input type="number" value={f.price} onChange={e=>s('price',e.target.value)} placeholder="1200"/></div>
+          <div className="fg"><label>Entradas disponibles</label><input type="number" value={f.totalTickets} onChange={e=>s('totalTickets',e.target.value)}/></div>
+          <div className="fg"><label>Categoría</label>
+            <select value={f.category} onChange={e=>{s('category',e.target.value);s('emoji',em[e.target.value]||'🏆');}}>
+              {Object.keys(em).map(k=><option key={k}>{k}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="mactions">
+          <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-navy" onClick={()=>{if(!f.title||!f.date||!f.price)return;onSave({...f,id:`EVT-${Date.now().toString().slice(-4)}`,price:Number(f.price),totalTickets:Number(f.totalTickets),sold:0});onClose();}}>Crear Evento</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PAGES ──────────────────────────────────────────
+
+function Dashboard({members,events}) {
+  const alDia = members.filter(m=>m.status==='Al día').length;
+  const vencido = members.filter(m=>m.status==='Vencido').length;
+  const revenue = events.reduce((a,e)=>a+e.sold*e.price,0);
+  const totalT = events.reduce((a,e)=>a+e.sold,0);
+  const stats = [
+    {lbl:'Total Socios',     val:members.length, ico:'👥', note:'+3 este mes',             line:'#0d1f5c'},
+    {lbl:'Al Día',           val:alDia,           ico:'✅', note:`${Math.round(alDia/members.length*100)}% del padrón`, line:'#1a8c4e'},
+    {lbl:'Cuotas Vencidas',  val:vencido,         ico:'⚠️', note:'Requieren contacto',      line:'#d93025'},
+    {lbl:'Entradas Vendidas',val:totalT,          ico:'🎟', note:`$${revenue.toLocaleString('es-AR')} recaudado`, line:'#009EE3'},
+  ];
+  return (
+    <div>
+      <div className="banner">
+        <EscudoBlue size={58}/>
+        <div>
+          <div className="banner-title">América del Sud</div>
+          <div className="banner-sub">Panel de Administración · {new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>
+      </div>
+      <div className="stats">
+        {stats.map((s,i) => (
+          <div key={i} className="stat">
+            <div className="stat-line" style={{background:s.line}}></div>
+            <div className="stat-ico">{s.ico}</div>
+            <div className="stat-lbl">{s.lbl}</div>
+            <div className="stat-val">{s.val}</div>
+            <div className="stat-note">{s.note}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:18}}>
+        <div className="card">
+          <div className="card-hdr"><span className="card-title">⚠️ Cuotas Vencidas</span></div>
+          <table><thead><tr><th>Socio</th><th>Ingresó</th><th>Estado</th></tr></thead><tbody>
+            {members.filter(m=>m.status!=='Al día').map(m=>(
+              <tr key={m.id}>
+                <td><div className="av-row"><Av m={m}/><div><div className="row-name">{m.name} {m.surname}</div><div className="row-id">{m.id}</div></div></div></td>
+                <td style={{color:'#6676a0'}}>{m.joinDate}</td>
+                <td><SBadge s={m.status}/></td>
+              </tr>
+            ))}
+          </tbody></table>
+        </div>
+        <div className="card">
+          <div className="card-hdr"><span className="card-title">🎟 Próximos Eventos</span></div>
+          <table><thead><tr><th>Evento</th><th>Vendidas</th><th>Recaudado</th></tr></thead><tbody>
+            {events.map(e=>(
+              <tr key={e.id}>
+                <td><div style={{fontWeight:700,color:'#0d1f5c'}}>{e.emoji} {e.title}</div><div className="row-id">{e.date}</div></td>
+                <td style={{color:'#6676a0'}}>{e.sold}/{e.totalTickets}</td>
+                <td style={{fontFamily:"'Oswald',sans-serif",fontSize:15,color:'#0d1f5c'}}>${(e.sold*e.price).toLocaleString('es-AR')}</td>
+              </tr>
+            ))}
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Members({members,setMembers}) {
+  const [q,setQ] = useState('');
+  const [qrM,setQrM] = useState(null);
+  const [upM,setUpM] = useState(null);
+  const [showNew,setShowNew] = useState(false);
+  const [filter,setFilter] = useState('Todos');
+  const list = members.filter(m => {
+    const ok = `${m.name} ${m.surname} ${m.id} ${m.activity}`.toLowerCase().includes(q.toLowerCase());
+    return ok && (filter==='Todos' || m.status===filter);
+  });
+  return (
+    <div>
+      <div className="page-hdr">
+        <div><div className="page-title">Padrón de Socios</div><div className="page-sub">{members.length} socios registrados</div></div>
+        <button className="btn btn-navy" onClick={()=>setShowNew(true)}>+ Nuevo Socio</button>
+      </div>
+      <div className="tabs">
+        {['Todos','Al día','Pendiente','Vencido'].map(s=>(
+          <div key={s} className={`tab ${filter===s?'on':''}`} onClick={()=>setFilter(s)}>{s}</div>
+        ))}
+      </div>
+      <div className="card">
+        <div className="card-hdr">
+          <span className="card-title">Socios</span>
+          <div className="search"><span>🔍</span><input placeholder="Buscar nombre, ID, actividad…" value={q} onChange={e=>setQ(e.target.value)}/></div>
+        </div>
+        <table>
+          <thead><tr><th>Socio</th><th>Actividad</th><th>Plan</th><th>Ingreso</th><th>Cuota</th><th>Credencial</th><th>Acciones</th></tr></thead>
+          <tbody>
+            {list.map(m=>(
+              <tr key={m.id}>
+                <td><div className="av-row"><Av m={m}/><div><div className="row-name">{m.name} {m.surname}</div><div className="row-id">{m.id}</div></div></div></td>
+                <td><span className="badge b-navy">{m.activity}</span></td>
+                <td>{m.familyPlan?<span className="badge b-blue">Familiar</span>:<span style={{color:'#6676a0',fontSize:13}}>Individual</span>}</td>
+                <td style={{color:'#6676a0'}}>{m.joinDate}</td>
+                <td><SBadge s={m.status}/></td>
+                <td>
+                  {m.nfc && <span title="NFC" style={{marginRight:5}}>📡</span>}
+                  <button className="btn btn-ghost btn-sm" onClick={()=>setQrM(m)}>📱 QR</button>
+                </td>
+                <td>
+                  <div style={{display:'flex',gap:5}}>
+                    <button className="btn btn-ghost btn-sm" onClick={()=>setUpM(m)}>📎 Pago</button>
+                    <button className="btn btn-ghost btn-sm" onClick={()=>setMembers(p=>p.map(x=>x.id===m.id?{...x,status:x.status==='Al día'?'Vencido':'Al día'}:x))}>✏️</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {list.length===0 && <div style={{padding:32,textAlign:'center',color:'#6676a0'}}>Sin resultados</div>}
+      </div>
+      {qrM && <QRModal member={qrM} onClose={()=>setQrM(null)}/>}
+      {upM && <UploadModal member={upM} onClose={()=>setUpM(null)}/>}
+      {showNew && <NewMemberModal onClose={()=>setShowNew(false)} onSave={m=>setMembers(p=>[...p,m])}/>}
+    </div>
+  );
+}
+
+function Access({members}) {
+  const [q,setQ] = useState('');
+  const [res,setRes] = useState(null);
+  const check = id => {
+    const m = members.find(m => m.id.toLowerCase()===id.toLowerCase() || `${m.name} ${m.surname}`.toLowerCase().includes(id.toLowerCase()));
+    setRes(m || 'nf');
+  };
+  return (
+    <div>
+      <div className="page-hdr"><div><div className="page-title">Control de Acceso</div><div className="page-sub">Verificación por QR o NFC</div></div></div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:22}}>
+        <div>
+          <div className="card" style={{padding:26}}>
+            <div style={{textAlign:'center',marginBottom:18}}>
+              <div style={{fontSize:38,marginBottom:8}}>📷</div>
+              <div style={{fontFamily:"'Oswald',sans-serif",fontSize:17,letterSpacing:1,color:'#0d1f5c',textTransform:'uppercase',marginBottom:4}}>Escanear QR / NFC</div>
+              <div style={{color:'#6676a0',fontSize:13}}>Ingresá el ID o nombre del socio para simular</div>
+            </div>
+            <div style={{display:'flex',gap:8,marginBottom:14}}>
+              <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Ej: SOC-001 o 'Martín'" style={{flex:1}} onKeyDown={e=>e.key==='Enter'&&check(q)}/>
+              <button className="btn btn-navy" onClick={()=>check(q)}>Verificar</button>
+            </div>
+            <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+              {members.map(m=><button key={m.id} className="btn btn-ghost btn-sm" onClick={()=>{setQ(m.id);check(m.id);}}>{m.id}</button>)}
+            </div>
+          </div>
+          {res && res!=='nf' && (
+            <div className={`acc-card ${res.status==='Al día'?'acc-ok':'acc-no'}`}>
+              <div style={{fontSize:52,marginBottom:6}}>{res.status==='Al día'?'✅':'❌'}</div>
+              <div style={{fontFamily:"'Oswald',sans-serif",fontSize:26,letterSpacing:2,textTransform:'uppercase',color:res.status==='Al día'?'#1a8c4e':'#d93025',marginBottom:10}}>
+                {res.status==='Al día'?'ACCESO PERMITIDO':'ACCESO DENEGADO'}
+              </div>
+              <Av m={res} size={58}/>
+              <div style={{fontFamily:"'Oswald',sans-serif",fontSize:19,color:'#0d1f5c',marginTop:8}}>{res.name} {res.surname}</div>
+              <div style={{color:'#6676a0',fontSize:13}}>{res.id} · {res.activity}</div>
+              <div style={{marginTop:8}}><SBadge s={res.status}/></div>
+              {res.status!=='Al día' && <div style={{marginTop:10,fontSize:12,color:'#d93025',fontWeight:700}}>⚠️ Derivar a administración</div>}
+            </div>
+          )}
+          {res==='nf' && (
+            <div className="acc-card acc-no" style={{marginTop:16}}>
+              <div style={{fontSize:48}}>❓</div>
+              <div style={{fontFamily:"'Oswald',sans-serif",fontSize:22,color:'#d93025'}}>SOCIO NO ENCONTRADO</div>
+              <div style={{color:'#6676a0',fontSize:13,marginTop:6}}>El código no corresponde a ningún socio.</div>
+            </div>
+          )}
+        </div>
+        <div className="card">
+          <div className="card-hdr"><span className="card-title">Estado General</span></div>
+          <table><thead><tr><th>Socio</th><th>NFC</th><th>Estado</th></tr></thead><tbody>
+            {members.map(m=>(
+              <tr key={m.id} style={{cursor:'pointer'}} onClick={()=>{setQ(m.id);check(m.id);}}>
+                <td><div className="av-row"><Av m={m}/><div><div className="row-name">{m.name} {m.surname}</div><div className="row-id">{m.activity}</div></div></div></td>
+                <td>{m.nfc?<span className="badge b-blue">📡 Sí</span>:<span style={{color:'#6676a0',fontSize:13}}>No</span>}</td>
+                <td><SBadge s={m.status}/></td>
+              </tr>
+            ))}
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Events({events,setEvents}) {
+  const [showNew,setShowNew] = useState(false);
+  const [payE,setPayE] = useState(null);
+  return (
+    <div>
+      <div className="page-hdr">
+        <div><div className="page-title">Eventos & Entradas</div><div className="page-sub">Gestión y venta online</div></div>
+        <button className="btn btn-navy" onClick={()=>setShowNew(true)}>+ Nuevo Evento</button>
+      </div>
+      <div className="egrid">
+        {events.map(e=>(
+          <div key={e.id} className="ecard">
+            <div className="ebanner">
+              <span style={{position:'relative',fontSize:50}}>{e.emoji}</span>
+              <span className="edate">{e.date}</span>
+            </div>
+            <div className="ebody">
+              <div className="etitle">{e.title}</div>
+              <div className="emeta"><span>🕐 {e.time}</span><span>📍 {e.location}</span><span>🎟 {e.sold}/{e.totalTickets} vendidas</span></div>
+              <div className="eprog"><div className="eprogbar" style={{width:`${Math.round(e.sold/e.totalTickets*100)}%`}}></div></div>
+              <div className="efooter">
+                <div><div className="eprice">$ {e.price.toLocaleString('es-AR')}</div><div className="eavail">{e.totalTickets-e.sold} disponibles</div></div>
+                <button className="btn btn-navy btn-sm" onClick={()=>setPayE(e)} disabled={e.sold>=e.totalTickets}>
+                  {e.sold>=e.totalTickets?'Agotado':'Comprar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {showNew && <NewEventModal onClose={()=>setShowNew(false)} onSave={ev=>setEvents(p=>[...p,ev])}/>}
+      {payE && <PaymentModal event={payE} onClose={()=>setPayE(null)}/>}
+    </div>
+  );
+}
+
+function Payments({members}) {
+  const [upM,setUpM] = useState(null);
+  return (
+    <div>
+      <div className="page-hdr"><div><div className="page-title">Comprobantes</div><div className="page-sub">Gestión de pagos de cuota social</div></div></div>
+      <div className="alert-info">ℹ️ Los comprobantes quedan vinculados al socio. El estado se actualiza al confirmar el pago.</div>
+      <div className="card">
+        <div className="card-hdr"><span className="card-title">Gestión de Cuotas</span></div>
+        <table><thead><tr><th>Socio</th><th>Actividad</th><th>Plan</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+          {members.map(m=>(
+            <tr key={m.id}>
+              <td><div className="av-row"><Av m={m}/><div><div className="row-name">{m.name} {m.surname}</div><div className="row-id">{m.id}</div></div></div></td>
+              <td><span className="badge b-navy">{m.activity}</span></td>
+              <td>{m.familyPlan?<span className="badge b-blue">Familiar</span>:<span style={{color:'#6676a0',fontSize:13}}>Individual</span>}</td>
+              <td><SBadge s={m.status}/></td>
+              <td><button className="btn btn-ghost btn-sm" onClick={()=>setUpM(m)}>📎 Cargar comprobante</button></td>
+            </tr>
+          ))}
+        </tbody></table>
+      </div>
+      {upM && <UploadModal member={upM} onClose={()=>setUpM(null)}/>}
+    </div>
+  );
+}
+
+// ── APP SHELL ──────────────────────────────────────
+function App() {
+  const [page,setPage] = useState('dashboard');
+  const [members,setMembers] = useState(initMembers);
+  const [events,setEvents] = useState(initEvents);
+
+  const nav = [
+    {sec:'Principal'},
+    {id:'dashboard', label:'Dashboard',        icon:'📊'},
+    {sec:'Socios'},
+    {id:'members',   label:'Padrón',            icon:'👥'},
+    {id:'access',    label:'Control de Acceso', icon:'🔐'},
+    {id:'payments',  label:'Comprobantes',      icon:'📎'},
+    {sec:'Club'},
+    {id:'events',    label:'Eventos & Entradas',icon:'🎟'},
+  ];
+
+  const renderPage = () => {
+    if (page==='dashboard') return <Dashboard members={members} events={events}/>;
+    if (page==='members')   return <Members   members={members} setMembers={setMembers}/>;
+    if (page==='access')    return <Access    members={members}/>;
+    if (page==='payments')  return <Payments  members={members}/>;
+    if (page==='events')    return <Events    events={events}   setEvents={setEvents}/>;
+  };
+
+  return (
+    <>
+      <div className="sidebar">
+        <div className="logo-area">
+          <Escudo size={50}/>
+          <div>
+            <div className="club-name-top">América<br/>del Sud</div>
+            <div className="club-name-bot">Gestión · Admin</div>
+          </div>
+        </div>
+        <nav className="nav">
+          {nav.map((item,i) =>
+            item.sec
+              ? <div key={i} className="nav-sec">{item.sec}</div>
+              : <div key={i} className={`nav-item ${page===item.id?'active':''}`} onClick={()=>setPage(item.id)}>
+                  <span className="nav-icon">{item.icon}</span>{item.label}
+                </div>
+          )}
+        </nav>
+        <div className="sidebar-foot">
+          <div className="av-admin">A</div>
+          <div><div className="av-name">Administrador</div><div className="av-role">América del Sud</div></div>
+        </div>
+      </div>
+      <main className="main">{renderPage()}</main>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
